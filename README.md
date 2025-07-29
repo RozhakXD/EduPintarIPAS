@@ -4,10 +4,10 @@
 
 ## 🔗 Live Demo
 Coba langsung aplikasinya di sini:
-👉 [https://edupintaripas.pythonanywhere.com/](https://edupintaripas.pythonanywhere.com/)
+👉 [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## 🖼️ Tampilan Aplikasi
-![Image](https://github.com/user-attachments/assets/a534fcee-0704-4244-957a-271c99e954ab)
+![Image](https://github.com/user-attachments/assets/7a9b7d24-bd52-4ded-b54c-44344fde73ab)
 
 ## 🚀 Fitur Utama
 - **🧠 Chatbot Cerdas:** Menjawab berbagai pertanyaan materi IPAS kelas 6, termasuk topik-topik IPA seperti Sistem Gerak, Energi, Lingkungan, dan Tata Surya, serta IPS seperti Sejarah Kemerdekaan, Geografi Dunia, dan Kerjasama Internasional.
