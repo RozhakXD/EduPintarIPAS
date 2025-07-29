@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chat dengan PINTARU - EduPintar IPAS</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <style>
+            body {
+                font-family: 'Nunito', sans-serif;
+            }
+
+            #chat-box::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            #chat-box::-webkit-scrollbar-track {
+                background: #111827;
+            }
+
+            #chat-box::-webkit-scrollbar-thumb {
+                background-color: #4f46e5;
+                border-radius: 20px;
+                border: 3px solid #111827;
+            }
+
+            .glass-chat {
+                background: rgba(17, 24, 39, 0.6);
+                backdrop-filter: blur(15px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 bg-cover bg-fixed bg-center text-white">
+        <div class="flex flex-col h-screen p-2 md:p-4">
+            <div class="flex-1 flex flex-col max-w-3xl w-full mx-auto glass-chat rounded-xl shadow-2xl shadow-purple-500/20">
+                <header class="flex items-center p-3 border-b border-purple-500/50 flex-shrink-0">
+                    <a href="{{ url_for('main.index') }}" class="text-white hover:bg-purple-700 rounded-full p-2 mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                    <img src="{{ url_for('static', filename='images/pintaru_avatar.jpg') }}" class="w-12 h-12 rounded-full border-2 border-purple-400">
+                    <div class="ml-4">
+                        <h2 class="text-xl font-bold text-white">PINTARU</h2>
+                        <p class="text-sm text-green-400">Online</p>
+                    </div>
+                </header>
+                <div id="chat-box" class="flex-1 p-4 overflow-y-auto"></div>
+                <footer class="p-3 flex-shrink-0">
+                    <form id="chat-form" class="flex items-center space-x-3">
+                        <input type="text" id="user-input" placeholder="Tanya apa saja ke Pintaru..." autocomplete="off" class="flex-1 p-3 bg-gray-800 text-white border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-3 shadow-lg transform hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                            </svg>
+                        </button>
+                    </form>
+                </footer>
+            </div>
+        </div>
+        <script>
+            const chatBox = document.getElementById('chat-box');
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+
+            function displayMessage(message, sender) {
+                const messageWrapper = document.createElement('div');
+                messageWrapper.classList.add('flex', 'items-end', 'mb-4', 'animate-fade-in');
+                let messageContent;
+                if (sender === 'user') {
+                    messageWrapper.classList.add('justify-end');
+                    messageContent = `
+                    
+											<div class="px-4 py-2 bg-blue-600 text-white rounded-t-lg rounded-l-lg max-w-xs md:max-w-md break-words">
+                        ${message}
+                    </div>
+											<img src="https://placehold.co/40x40/76A9EA/FFFFFF?text=U" alt="User Avatar" class="w-8 h-8 rounded-full ml-3 flex-shrink-0">
+                `;
+                } else {
+                    messageWrapper.classList.add('justify-start');
+                    messageContent = `
+                    
+												<img src="{{ url_for('static', filename='images/pintaru_avatar.jpg') }}" class="w-8 h-8 rounded-full mr-3 flex-shrink-0">
+													<div class="px-4 py-2 bg-purple-800 text-white rounded-t-lg rounded-r-lg max-w-xs md:max-w-md break-words">
+                        ${message}
+                    </div>
+                `;
+                }
+                messageWrapper.innerHTML = messageContent;
+                chatBox.appendChild(messageWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            function displayTypingIndicator() {
+                const typingIndicator = document.createElement('div');
+                typingIndicator.id = 'typing-indicator';
+                typingIndicator.classList.add('flex', 'items-end', 'mb-4');
+                typingIndicator.innerHTML = `
+                
+													<img src="{{ url_for('static', filename='images/pintaru_avatar.jpg') }}" class="w-8 h-8 rounded-full mr-3">
+														<div class="px-4 py-2 bg-purple-800 text-white rounded-t-lg rounded-r-lg">
+															<div class="flex items-center space-x-1">
+																<span class="w-2 h-2 bg-gray-300 rounded-full animate-pulse" style="animation-delay: 0s;"></span>
+																<span class="w-2 h-2 bg-gray-300 rounded-full animate-pulse" style="animation-delay: 0.2s;"></span>
+																<span class="w-2 h-2 bg-gray-300 rounded-full animate-pulse" style="animation-delay: 0.4s;"></span>
+															</div>
+														</div>
+            `;
+                chatBox.appendChild(typingIndicator);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            function removeTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+            }
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userMessage = userInput.value.trim();
+                if (!userMessage) return;
+                displayMessage(userMessage, 'user');
+                userInput.value = '';
+                displayTypingIndicator();
+                try {
+                    const response = await fetch("/ask", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            question: userMessage
+                        }),
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    removeTypingIndicator();
+                    if (data.answer) {
+                        displayMessage(data.answer, 'bot');
+                    } else {
+                        throw new Error("Format respons tidak valid dari server.");
+                    }
+                } catch (error) {
+                    removeTypingIndicator();
+                    displayMessage('Aduh, sepertinya koneksiku ke planet Edukazia sedang terganggu. Coba lagi nanti ya!', 'bot');
+                }
+            });
+            window.onload = () => {
+                displayMessage('Halo! Aku Pintaru. Ada yang bisa aku bantu seputar pelajaran IPAS? Tanya saja!', 'bot');
+                userInput.focus();
+            };
+            const style = document.createElement('style');
+            style.innerHTML = `
+            @keyframes fade-in {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-in {
+                animation: fade-in 0.5s ease-out forwards;
+            }
+        `;
+            document.head.appendChild(style);
+        </script>
+    </body>
+</html>

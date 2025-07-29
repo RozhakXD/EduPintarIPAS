@@ -1,42 +1,31 @@
-from flask import render_template, request, jsonify, current_app
+from flask import render_template, request, jsonify
 from app.main import bp
 from app.services.qna_service import QnAService
 
-chat_history = []
+@bp.route('/ask', methods=['POST'])
+def ask():
+    try:
+        data = request.get_json()
+        if not data or 'question' not in data:
+            return jsonify({'error': 'Maaf, kami tidak menemukan pertanyaan Anda. Mohon sertakan field "question" pada permintaan Anda.'}), 400
 
-@bp.route('/', methods=['GET', 'POST'])
+        question = data['question']
+        if not question:
+            return jsonify({'error': 'Tidak ada pertanyaan yang diberikan.'}), 400
+
+        qna_service = QnAService()
+        
+        answer_text, confidence = qna_service.get_answer(question) 
+        
+        return jsonify({'answer': answer_text})
+
+    except Exception as e:
+        return jsonify({'error': 'Terjadi kesalahan internal pada server.'}), 500
+
+@bp.route('/')
 def index():
-    global chat_history
+    return render_template('index.html')
 
-    if request.method == 'POST':
-        user_question = request.form.get('question')
-        if not user_question:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'error': 'No question provided'}), 400
-
-        qna_service_instance = QnAService()
-        bot_answer, confidence = qna_service_instance.get_answer(user_question)
-
-        chat_history.append({'sender': 'user', 'text': user_question})
-        chat_history.append({'sender': 'bot', 'text': bot_answer, 'confidence': confidence})
-
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({
-                'user_question': user_question,
-                'bot_answer': bot_answer,
-                'confidence': confidence
-            })
-
-        return render_template('index.html',
-                               title='EduPintar IPAS',
-                               chat_history=chat_history)
-
-    else:
-        chat_history = []
-        chat_history.append({
-            'sender': 'bot',
-            'text': 'Halo! Aku EduPintar. Siap belajar IPAS seru hari ini? Tanya apa saja tentang pelajaran IPAS kelas 6, ya!'
-        })
-        return render_template('index.html',
-                               title='EduPintar IPAS',
-                               chat_history=chat_history)
+@bp.route('/chat')
+def chat():
+    return render_template('chat.html')
